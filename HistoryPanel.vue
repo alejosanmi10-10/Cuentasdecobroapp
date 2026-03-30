@@ -44,7 +44,8 @@ const loading = ref(false);
 const loadHistory = async () => {
     loading.value = true;
     try {
-        const res = await fetch('/api/quincenas');
+        const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3001' : '';
+        const res = await fetch(`${API_BASE}/api/quincenas`);
         if(res.ok) {
             quincenas.value = await res.json();
         }
@@ -90,7 +91,8 @@ const loadQuincena = (q) => {
 const deleteQuincena = async (id) => {
     if(!confirm('¿Estás seguro de que deseas eliminar permanentemente este registro?')) return;
     try {
-        await fetch(`/api/quincenas/${id}`, { method: 'DELETE' });
+        const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3001' : '';
+        await fetch(`${API_BASE}/api/quincenas/${id}`, { method: 'DELETE' });
         loadHistory();
     } catch(e) {
         alert("Error eliminando quincena");

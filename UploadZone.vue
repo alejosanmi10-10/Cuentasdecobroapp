@@ -51,7 +51,8 @@ const processFile = async (file) => {
   formData.append('invoice', file);
   
   try {
-    const response = await fetch('/api/upload', {
+    const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3001' : '';
+    const response = await fetch(`${API_BASE}/api/upload`, {
       method: 'POST',
       body: formData
     });
