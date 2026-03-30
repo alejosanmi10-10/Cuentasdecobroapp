@@ -27,10 +27,10 @@
         <h3>Arrastra y suelta tus Guías de Transporte aquí</h3>
         <p class="subtitle">Soporta múltiples imágenes separadas o un PDF completo a la vez.</p>
         
-        <label class="upload-btn">
+        <button class="upload-btn" @click="triggerFileInput">
           Seleccionar Archivos
-          <input type="file" style="display: none;" @change="handleFileSelect" accept="image/jpeg, image/png, application/pdf" multiple />
-        </label>
+        </button>
+        <input ref="fileInputRef" type="file" style="display: none;" @change="handleFileSelect" accept="image/jpeg, image/png, application/pdf" multiple />
       </div>
     </div>
   </div>
@@ -43,8 +43,15 @@ const dragover = ref(false);
 const loading = ref(false);
 const processedCount = ref(0);
 const totalCount = ref(0);
+const fileInputRef = ref(null);
 
 const emit = defineEmits(['upload-success']);
+
+const triggerFileInput = () => {
+  if (fileInputRef.value) {
+    fileInputRef.value.click();
+  }
+};
 
 const processFile = async (file) => {
   const formData = new FormData();
