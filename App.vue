@@ -200,7 +200,7 @@ const saveFortnight = async () => {
             data: tableData.value
         };
         
-        const response = await fetch('http://localhost:3001/api/quincenas', {
+        const response = await fetch('/api/quincenas', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
