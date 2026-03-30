@@ -170,4 +170,37 @@ const saveAndClose = () => {
     cursor: pointer;
     text-transform: uppercase;
 }
+
+/* ==================================
+   RESPONSIVO / MOBILE (Smartphones)
+   ================================== */
+@media (max-width: 600px) {
+    .admin-modal {
+        padding: 1rem;
+    }
+    .modal-header h2 {
+        font-size: 1.3rem;
+    }
+    .rate-item {
+        flex-direction: column;
+        background: #f8fafc;
+        padding: 10px;
+        position: relative;
+    }
+    .rate-input {
+        width: 100%;
+    }
+    .price-input-group {
+        width: 100%;
+    }
+    .price-val {
+        width: 100%;
+    }
+    .remove-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        padding: 5px 10px;
+    }
+}
 </style>

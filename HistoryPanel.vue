@@ -161,4 +161,24 @@ const deleteQuincena = async (id) => {
     color: var(--text-light);
     padding: 30px;
 }
+
+/* ==================================
+   RESPONSIVO / MOBILE (Smartphones)
+   ================================== */
+@media (max-width: 600px) {
+    .history-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+        padding: 12px;
+    }
+    .history-actions {
+        width: 100%;
+        flex-direction: row;
+    }
+    .btn {
+        flex: 1;
+        text-align: center;
+    }
+}
 </style>
