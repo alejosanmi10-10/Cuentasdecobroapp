@@ -58,7 +58,8 @@ const processFile = async (file) => {
     });
     
     if (!response.ok) {
-        throw new Error('Error al procesar el documento con el servidor.');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Error al procesar el documento con el servidor.');
     }
     
     const result = await response.json();
@@ -66,8 +67,7 @@ const processFile = async (file) => {
     emit('upload-success', result.data);
   } catch (error) {
     console.error("Fallo al procesar el archivo individual:", error);
-    // Podríamos notificar por archivo, pero para no abrumar al usuario,
-    // se continúa silenciosamente con el siguiente en el lote.
+    alert("❌ Fallo en la extracción: " + error.message);
   } finally {
     processedCount.value++;
   }

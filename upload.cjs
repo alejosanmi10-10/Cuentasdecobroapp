@@ -29,7 +29,7 @@ router.post('/', upload.single('invoice'), async (req, res) => {
         });
     } catch (error) {
         console.error('Error processing upload:', error);
-        res.status(500).json({ error: 'Internal server error while processing the invoice' });
+        res.status(500).json({ error: error.message || 'Internal server error while processing the invoice' });
     }
 });
 
