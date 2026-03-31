@@ -31,10 +31,10 @@ const extractInvoiceData = async (imagePath, mimeType = 'application/pdf') => {
         {
             "fecha_salida": "DD/MM/YY" (toma la fecha de salida o fecha visible, conviértela al formato día/mes/año corto ej: 2/02/26),
             "cliente": "Nombre exacto del cliente comprador o destino (ej: ESTACION DE SERVICIO CENTRO DE...)",
-            "destino": "Escribe siempre la palabra YUMBO de manera fija",
+            "destino": "YUMBO",
             "galonaje": numero (la cantidad en galones o Volumen máximo, ej: 3200),
-            "numero_factura": "Número de guía o número de factura",
-            "placa": "Busca especificamente 'Placa cabezote' en la sección INFORMACIÓN TRANSPORTE abajo a la derecha (ej: SSK877)",
+            "numero_factura": "Extrae ESTRICTAMENTE el 'Número de guía' (usualmente empieza por 4500...), NO extraigas el 'Número de Factura'",
+            "placa": "Extrae el texto de 'Placa cabezote' que está abajo a la derecha en INFORMACIÓN TRANSPORTE (ej: SSK877)",
             "total_calculado": numero (si no hay total impreso, déjalo vacío)
         }
 
