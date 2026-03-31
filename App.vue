@@ -118,11 +118,11 @@ const exportToCSV = () => { // Se mantiene el nombre por compatibilidad con el t
     
     // Preparar datos en un formato legible para la librería de Excel
     const exportData = tableData.value.map(item => ({
-        'DESTINO': item.destino,
-        'CLIENTE': item.cliente,
-        '# DE GUÍA': item.numero_factura,
-        'GALONAJE': Number(item.galonaje) || item.galonaje,
         'FECHA': item.fecha_salida,
+        'CLIENTE': item.cliente,
+        'DESTINO': item.destino,
+        'GALONAJE': Number(item.galonaje) || item.galonaje,
+        '# DE FACTURA': item.numero_factura,
         'PLACA': item.placa,
         'TOTAL': Number(item.total_calculado) || item.total_calculado || ''
     }));

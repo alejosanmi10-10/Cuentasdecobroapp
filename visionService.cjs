@@ -30,19 +30,19 @@ const extractInvoiceData = async (imagePath, mimeType = 'application/pdf') => {
         Para CADA GUIA DIGITAL DE TRANSPORTE encontrada, extrae estrictamente un objeto JSON con la siguiente estructura:
         {
             "fecha_salida": "DD/MM/YY" (toma la fecha de salida o fecha visible, conviértela al formato día/mes/año corto ej: 2/02/26),
-            "cliente": "Nombre exacto del cliente comprador o destino (ej: ESTACION DE SERVICIO CENTRO DE...)",
-            "destino": "YUMBO",
-            "galonaje": numero (la cantidad en galones o Volumen máximo, ej: 3200),
-            "numero_factura": "Extrae el texto exacto de 'Número de guía:' que está justo debajo del título INFORMACIÓN GENERAL (ej: 4500320001689074). Ignora el 'Número de Factura'.",
-            "placa": "Extrae el texto de 'Placa cabezote' que está abajo a la derecha en INFORMACIÓN TRANSPORTE (ej: SSK877)",
-            "total_calculado": numero (si no hay total impreso, déjalo vacío)
+            "cliente": "Nombre exacto del cliente",
+            "destino": "Ciudad o lugar de destino",
+            "galonaje": numero (la cantidad en galones, ej: 4000),
+            "numero_factura": "Número de factura o guía",
+            "placa": "Placa del vehículo (ej: ABC-123)",
+            "total_calculado": numero (el valor total que aparezca cobrado, o déjalo vacío si no hay)
         }
 
         Si encuentras múltiples páginas y son Guías Válidas, debes extraer un arreglo con TODAS sin saltarte ninguna. Si una página es una Factura Electrónica, saltatela como si no existiera.
 
         Devuelve ÚNICAMENTE un arreglo JSON válido, sin formato adicional, markdown (\`\`\`), ni explicaciones de texto. Ejemplo estricto:
         [
-            { "fecha_salida": "16/03/26", "cliente": "ESTACION DE SERVICIO LA FONTANA", "destino": "YUMBO", "galonaje": 3200, "numero_factura": "4500320001689074", "placa": "SSK877", "total_calculado": "" }
+            { "fecha_salida": "2/01/26", "cliente": "TULUA", "destino": "CALI", "galonaje": 3000, "numero_factura": "4200059908", "placa": "XYZ-987", "total_calculado": 1500000 }
         ]
         `;
 
