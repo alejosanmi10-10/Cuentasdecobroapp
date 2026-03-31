@@ -11,6 +11,7 @@
         />
         <div class="header-actions">
           <button @click="$emit('save')" class="action-btn save-btn">Guardar</button>
+          <button @click="$emit('open-print')" class="action-btn print-btn">📄 Generar Cuenta de Cobro</button>
           <button @click="$emit('export')" class="action-btn export-btn">Descargar a Excel</button>
           <button @click="$emit('clear')" class="action-btn clear-btn">Nueva Quincena</button>
         </div>
@@ -68,7 +69,7 @@ const props = defineProps({
   }
 });
 
-defineEmits(['update:title', 'export', 'clear', 'save']);
+defineEmits(['update:title', 'export', 'clear', 'save', 'open-print']);
 
 const totalSum = computed(() => {
   return props.data.reduce((sum, item) => sum + Number(item.total_calculado || 0), 0);

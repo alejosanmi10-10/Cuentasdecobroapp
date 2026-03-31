@@ -60,8 +60,8 @@ const defaultRates = [
   { client: "TULUA", price: 160, discount: 10, isFixed: false },
   { client: "IGLESIA CRISTIANA", price: 355811, discount: 0, isFixed: true },
   { client: "POLIMIX", price: 366148, discount: 0, isFixed: true },
-  { client: "VIDRIO", price: 439, discount: 10, isFixed: false },
-  { client: "GLAWA", price: 327898, discount: 0, isFixed: true }
+  { client: "PWR SERVICE", price: 439, discount: 10, isFixed: false },
+  { client: "ELAWA", price: 327898, discount: 0, isFixed: true }
 ];
 
 // Cargar del localStorage al abrir
@@ -112,12 +112,15 @@ const saveAndClose = () => {
 
 .admin-modal {
     background: white;
-    width: 500px;
-    max-width: 90%;
+    width: 800px;
+    max-width: 95%;
+    max-height: 90vh;
     border: 4px solid #1a1a1a;
     box-shadow: 10px 10px 0px #1a1a1a;
     padding: 2rem;
     position: relative;
+    display: flex;
+    flex-direction: column;
 }
 
 .modal-header {
@@ -125,6 +128,12 @@ const saveAndClose = () => {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1.5rem;
+    flex-shrink: 0;
+}
+
+.modal-body {
+    overflow-y: auto;
+    padding-right: 10px;
 }
 
 .close-btn {
@@ -144,6 +153,7 @@ const saveAndClose = () => {
     display: flex;
     gap: 10px;
     margin-bottom: 10px;
+    align-items: stretch;
 }
 
 .rate-input {
@@ -151,6 +161,8 @@ const saveAndClose = () => {
     border: 2px solid #1a1a1a;
     font-family: inherit;
     font-weight: 600;
+    flex: 2;
+    min-width: 120px;
 }
 
 .price-input-group {
@@ -158,11 +170,15 @@ const saveAndClose = () => {
     align-items: center;
     border: 2px solid #1a1a1a;
     padding-left: 10px;
+    flex: 1.5;
+    background: white;
 }
 
 .price-val {
     border: none !important;
-    width: 90px;
+    width: 100%;
+    min-width: 60px;
+    padding: 0 5px;
 }
 
 .discount-input-group {
@@ -171,11 +187,13 @@ const saveAndClose = () => {
     border: 2px solid #1a1a1a;
     padding: 0 5px;
     background: #f8fafc;
+    flex: 1;
 }
 
 .discount-val {
     border: none !important;
-    width: 60px;
+    width: 100%;
+    min-width: 40px;
     text-align: center;
     background: transparent;
 }
@@ -196,6 +214,8 @@ const saveAndClose = () => {
     font-size: 0.85rem;
     font-weight: bold;
     gap: 5px;
+    flex: 1;
+    white-space: nowrap;
 }
 
 .remove-btn {
@@ -203,6 +223,8 @@ const saveAndClose = () => {
     border: 2px solid #ef4444;
     cursor: pointer;
     border-radius: 4px;
+    padding: 0 15px;
+    flex-shrink: 0;
 }
 
 .add-rate-btn {

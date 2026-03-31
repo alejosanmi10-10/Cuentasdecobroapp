@@ -1,45 +1,58 @@
 <template>
   <div class="app-container">
-    <header class="app-header">
-      <div class="header-top">
-        <h1>Automatización de Cuentas de Cobro</h1>
-        <div class="header-buttons">
-            <button @click="showHistory = true" class="history-btn">🗂️ Historial</button>
-            <button @click="showAdmin = true" class="config-btn">⚙️ Configurar Precios</button>
+    <div class="no-print-area">
+      <header class="app-header">
+        <div class="header-top">
+          <h1>Automatización de Cuentas de Cobro</h1>
+          <div class="header-buttons">
+              <button @click="showHistory = true" class="history-btn">🗂️ Historial</button>
+              <button @click="showAdmin = true" class="config-btn">⚙️ Configurar Precios</button>
+          </div>
         </div>
+        <p>Sube las fotos de tus Guías de Transporte. La Inteligencia Artificial extraerá los datos automáticamente.</p>
+      </header>
+      
+      <!-- Alerta visual moderna para duplicados bloqueados -->
+      <div v-if="duplicateMessage" class="duplicate-alert fade-in">
+        <span class="icon">⚠️</span>
+        {{ duplicateMessage }}
       </div>
-      <p>Sube las fotos de tus Guías de Transporte. La Inteligencia Artificial extraerá los datos automáticamente.</p>
-    </header>
-    
-    <!-- Alerta visual moderna para duplicados bloqueados -->
-    <div v-if="duplicateMessage" class="duplicate-alert fade-in">
-      <span class="icon">⚠️</span>
-      {{ duplicateMessage }}
+
+      <main class="main-content">
+        <UploadZone @upload-success="handleUploadSuccess" />
+        <ResultsTable 
+          :data="tableData" 
+          v-model:title="periodTitle"
+          @export="exportToCSV"
+          @clear="clearFortnight"
+          @save="saveFortnight"
+          @open-print="handleOpenPrint"
+        />
+      </main>
+
+      <!-- Panel de Administración -->
+      <AdminPanel 
+        :show="showAdmin" 
+        @close="showAdmin = false" 
+        @updated="handleRatesUpdated"
+      />
+
+      <!-- Historial -->
+      <HistoryPanel 
+        :show="showHistory" 
+        @close="showHistory = false" 
+        @load-quincena="loadFortnight"
+      />
     </div>
 
-    <main class="main-content">
-      <UploadZone @upload-success="handleUploadSuccess" />
-      <ResultsTable 
-        :data="tableData" 
-        v-model:title="periodTitle"
-        @export="exportToCSV"
-        @clear="clearFortnight"
-        @save="saveFortnight"
-      />
-    </main>
-
-    <!-- Modal de Administración -->
-    <AdminPanel 
-      :show="showAdmin" 
-      @close="showAdmin = false" 
-      @updated="handleRatesUpdated"
-    />
-
-    <!-- Historial -->
-    <HistoryPanel 
-      :show="showHistory" 
-      @close="showHistory = false" 
-      @load-quincena="loadFortnight"
+    <!-- Documento Imprimible (FUERA del no-print-area) -->
+    <PrintDocument 
+      :show="showPrint" 
+      :tableData="tableData" 
+      :tableTitle="periodTitle"
+      :invoiceNumber="printInvoiceNumber"
+      :invoiceDate="printInvoiceDate"
+      @close="showPrint = false" 
     />
   </div>
 </template>
@@ -50,6 +63,7 @@ import UploadZone from './UploadZone.vue';
 import ResultsTable from './ResultsTable.vue';
 import AdminPanel from './AdminPanel.vue';
 import HistoryPanel from './HistoryPanel.vue';
+import PrintDocument from './PrintDocument.vue';
 import './styles.css';  // Import custom styles
 
 // Estado centralizado e histórico
@@ -58,15 +72,84 @@ const periodTitle = ref('QUINCENA DEL 1 AL 15 DE FEBRERO');
 const duplicateMessage = ref('');
 const showAdmin = ref(false);
 const showHistory = ref(false);
+const showPrint = ref(false);
+const printInvoiceNumber = ref('');
+const printInvoiceDate = ref('');
 const currentQuincenaId = ref(null);
 
-// Cargar tarifas iniciales
-const masterRates = ref(JSON.parse(localStorage.getItem('invoice_rates') || '[]'));
+// Tarifas por defecto para inicialización
+const defaultRates = [
+  { client: "CARVAJAL", price: 525600, discount: 0, isFixed: true },
+  { client: "ETERNIT", price: 176928, discount: 0, isFixed: true },
+  { client: "SERVICIOS INDUSTRIALES", price: 314748, discount: 0, isFixed: true },
+  { client: "BRASILIA", price: 80, discount: 10, isFixed: false },
+  { client: "BUCANERO", price: 392400, discount: 0, isFixed: true },
+  { client: "LIMONES", price: 314343, discount: 0, isFixed: true },
+  { client: "TULUA", price: 160, discount: 10, isFixed: false },
+  { client: "IGLESIA CRISTIANA", price: 355811, discount: 0, isFixed: true },
+  { client: "POLIMIX", price: 366148, discount: 0, isFixed: true },
+  { client: "PWR SERVICE", price: 439, discount: 10, isFixed: false },
+  { client: "ELAWA", price: 327898, discount: 0, isFixed: true }
+];
+
+// Cargar tarifas iniciales (desde localStorage o usando las de por defecto)
+const getInitialRates = () => {
+    const saved = localStorage.getItem('invoice_rates');
+    if (saved && saved !== '[]') {
+        return JSON.parse(saved);
+    }
+    return defaultRates;
+};
+
+const masterRates = ref(getInitialRates());
 
 const handleRatesUpdated = (newRates) => {
     masterRates.value = newRates;
-    // Opcional: Recalcular tabla actual si el usuario lo desea, 
-    // pero por ahora solo se aplicará a nuevas subidas para no alterar lo ya editado manualmente.
+    recalculatePrices(); // ¡ESTO ES NUEVO! Actualiza los precios de lo que ya tienes cargado
+};
+
+const recalculatePrices = () => {
+    tableData.value = tableData.value.map(row => {
+        const clientName = row.client || row.cliente || '';
+        const sortedRates = [...masterRates.value].sort((a, b) => b.client.length - a.client.length);
+        const rate = sortedRates.find(r => clientName.toUpperCase().includes(r.client.toUpperCase()));
+        
+        let total = row.total_calculado;
+        if (rate) {
+            if (rate.isFixed) {
+                total = rate.price;
+            } else {
+                total = (Number(row.galonaje) || 0) * rate.price;
+            }
+            
+            if (rate.discount) {
+                total -= total * (rate.discount / 100);
+            }
+        }
+        return { ...row, total_calculado: Math.round(total) };
+    });
+};
+
+const handleOpenPrint = () => {
+    if (tableData.value.length === 0) {
+        alert('Agrega datos a la tabla primero para generar la cuenta.');
+        return;
+    }
+    
+    // 1. Número de Cuenta
+    const num = prompt('¿Qué número de Cuenta de Cobro es?', '108');
+    if (num === null) return; // canceló
+    printInvoiceNumber.value = num;
+
+    // 2. Fecha (Formato de ejemplo del documento)
+    const months = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
+    const d = new Date();
+    const defaultDate = `${d.getDate()} DE ${months[d.getMonth()]} DEL ${d.getFullYear()}`;
+    const dateInput = prompt('Confirma la fecha para el documento:', defaultDate);
+    if (dateInput === null) return; // canceló
+    printInvoiceDate.value = dateInput;
+
+    showPrint.value = true;
 };
 
 const handleUploadSuccess = (extractedData) => {
@@ -84,7 +167,8 @@ const handleUploadSuccess = (extractedData) => {
         } else {
             // --- CÁLCULO AUTOMÁTICO DE VALORES ---
             const clientName = newInvoice.client || newInvoice.cliente || '';
-            const rate = masterRates.value.find(r => clientName.toUpperCase().includes(r.client.toUpperCase()));
+            const sortedRates = [...masterRates.value].sort((a, b) => b.client.length - a.client.length);
+            const rate = sortedRates.find(r => clientName.toUpperCase().includes(r.client.toUpperCase()));
             
             let total = 0;
             if (rate) {

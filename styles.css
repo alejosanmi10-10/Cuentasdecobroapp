@@ -78,6 +78,7 @@ body {
     letter-spacing: -1px;
     margin-bottom: 0.5rem;
     background: linear-gradient(90deg, #1e293b, #3b82f6);
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -410,6 +411,18 @@ tfoot td {
     box-shadow: 2px 2px 0px #1e40af;
 }
 
+.print-btn {
+    background-color: #6366f1;
+    color: white;
+    border-color: #4338ca;
+}
+
+.print-btn:hover {
+    background-color: #4338ca;
+    color: white;
+    box-shadow: 2px 2px 0px #312e81;
+}
+
 .history-btn {
     padding: 8px 16px;
     background: #f8fafc;
@@ -538,5 +551,14 @@ tfoot td {
         text-align: center;
         font-size: 0.95rem;
         padding: 1rem;
+    }
+}
+
+/* ==================================
+   PRINT STYLES
+   ================================== */
+@media print {
+    .no-print-area, .header-buttons, .admin-modal-overlay, .duplicate-alert {
+        display: none !important;
     }
 }

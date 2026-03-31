@@ -30,7 +30,7 @@ const extractInvoiceData = async (imagePath, mimeType = 'application/pdf') => {
         Para CADA GUIA DIGITAL DE TRANSPORTE encontrada, extrae estrictamente un objeto JSON con la siguiente estructura:
         {
             "fecha_salida": "DD/MM/YY" (toma la fecha de salida o fecha visible, conviértela al formato día/mes/año corto ej: 2/02/26),
-            "cliente": "Nombre exacto del cliente, comprador o destino (ej: TRANSPORTES REFRICAR S.A.S. -> deja solo TRANSPORTES REFRICAR)",
+            "cliente": "Nombre exacto del cliente, comprador y OBLIGATORIAMENTE LA CIUDAD O SEDE DESTINO (ej: 'NUTRIENTES AVICOLAS TULUA' o 'CARVAJAL PLANTA 2 CALOTO'). REGLA EXCEPCIONAL: Si el destino es 'PWR SERVICE', déjalo exactamente como 'PWR SERVICE' sin agregarle la palabra 'Cali' ni otras ciudades.",
             "galonaje": numero (la cantidad en galones, ej: 4000),
             "numero_factura": "Número de factura (ej: 4200060683)",
             "total_calculado": "" (deja esto vacío ya que el total se calculará después)
