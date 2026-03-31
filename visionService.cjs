@@ -30,19 +30,17 @@ const extractInvoiceData = async (imagePath, mimeType = 'application/pdf') => {
         Para CADA GUIA DIGITAL DE TRANSPORTE encontrada, extrae estrictamente un objeto JSON con la siguiente estructura:
         {
             "fecha_salida": "DD/MM/YY" (toma la fecha de salida o fecha visible, conviértela al formato día/mes/año corto ej: 2/02/26),
-            "cliente": "Nombre exacto del cliente",
-            "destino": "Ciudad o lugar de destino",
+            "cliente": "Nombre exacto del cliente, comprador o destino (ej: TRANSPORTES REFRICAR S.A.S. -> deja solo TRANSPORTES REFRICAR)",
             "galonaje": numero (la cantidad en galones, ej: 4000),
-            "numero_factura": "Número de factura o guía",
-            "placa": "Placa del vehículo (ej: ABC-123)",
-            "total_calculado": numero (el valor total que aparezca cobrado, o déjalo vacío si no hay)
+            "numero_factura": "Número de factura (ej: 4200060683)",
+            "total_calculado": "" (deja esto vacío ya que el total se calculará después)
         }
 
         Si encuentras múltiples páginas y son Guías Válidas, debes extraer un arreglo con TODAS sin saltarte ninguna. Si una página es una Factura Electrónica, saltatela como si no existiera.
 
         Devuelve ÚNICAMENTE un arreglo JSON válido, sin formato adicional, markdown (\`\`\`), ni explicaciones de texto. Ejemplo estricto:
         [
-            { "fecha_salida": "2/01/26", "cliente": "TULUA", "destino": "CALI", "galonaje": 3000, "numero_factura": "4200059908", "placa": "XYZ-987", "total_calculado": 1500000 }
+            { "fecha_salida": "2/01/26", "cliente": "TULUA", "galonaje": 3000, "numero_factura": "4200059908", "total_calculado": "" }
         ]
         `;
 

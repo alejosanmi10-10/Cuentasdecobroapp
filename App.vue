@@ -94,7 +94,7 @@ const handleUploadSuccess = (extractedData) => {
             // Bandera 'isNew' para la animación verde de CSS en ResultsTable
             tableData.value.push({ 
                 ...newInvoice, 
-                total_calculado: newInvoice.total_calculado || total || '',
+                total_calculado: total || newInvoice.total_calculado || '',
                 isNew: true 
             });
         }
@@ -120,11 +120,9 @@ const exportToCSV = () => { // Se mantiene el nombre por compatibilidad con el t
     const exportData = tableData.value.map(item => ({
         'FECHA': item.fecha_salida,
         'CLIENTE': item.cliente,
-        'DESTINO': item.destino,
         'GALONAJE': Number(item.galonaje) || item.galonaje,
         '# DE FACTURA': item.numero_factura,
-        'PLACA': item.placa,
-        'TOTAL': Number(item.total_calculado) || item.total_calculado || ''
+        'TOTAL': Number(item.total_calculado) || ''
     }));
     
     // Construir la estructura completa de Excel
