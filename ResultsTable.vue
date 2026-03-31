@@ -21,8 +21,10 @@
           <tr>
             <th>FECHA</th>
             <th>CLIENTE</th>
+            <th>DESTINO</th>
             <th>GALONAJE</th>
             <th># DE FACTURA</th>
+            <th>PLACA</th>
             <th>TOTAL</th>
           </tr>
         </thead>
@@ -33,19 +35,23 @@
             
             <td><input v-model="row.cliente" class="editable-cell text-input" /></td>
             
+            <td><input v-model="row.destino" class="editable-cell text-input" /></td>
+            
             <td><input type="number" v-model="row.galonaje" class="editable-cell num-input" /></td>
 
             <td><input v-model="row.numero_factura" class="editable-cell num-input" /></td>
+            
+            <td><input v-model="row.placa" class="editable-cell text-input" /></td>
 
             <td class="focus-cell"><input type="number" v-model="row.total_calculado" class="editable-cell num-input total-input" /></td>
           </tr>
           <tr v-if="data.length === 0">
-            <td colspan="5" class="empty-state">No hay facturas en esta quincena todavía. Arrastra tu documento arriba.</td>
+            <td colspan="7" class="empty-state">No hay facturas en esta quincena todavía. Arrastra tu documento arriba.</td>
           </tr>
         </tbody>
         <tfoot>
           <tr>
-            <td colspan="4" class="tfoot-label">TOTAL</td>
+            <td colspan="6" class="tfoot-label">TOTAL</td>
             <td class="total-sum num">{{ formatCurrency(totalSum) }}</td>
           </tr>
         </tfoot>
