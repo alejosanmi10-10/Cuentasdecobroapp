@@ -19,11 +19,11 @@
       <table>
         <thead>
           <tr>
-            <th>FECHA</th>
-            <th>CLIENTE</th>
             <th>DESTINO</th>
+            <th>CLIENTE</th>
+            <th># DE GUÍA</th>
             <th>GALONAJE</th>
-            <th># DE FACTURA</th>
+            <th>FECHA</th>
             <th>PLACA</th>
             <th>TOTAL</th>
           </tr>
@@ -31,15 +31,15 @@
         <tbody>
           <!-- Iteración sobre un array único controlado desde App.vue -->
           <tr v-for="(row, index) in data" :key="index" :class="{'new-row': row.isNew}">
-            <td>{{ row.fecha_salida }}</td>
+            <td><input v-model="row.destino" class="editable-cell text-input" /></td>
             
             <td><input v-model="row.cliente" class="editable-cell text-input" /></td>
             
-            <td><input v-model="row.destino" class="editable-cell text-input" /></td>
+            <td><input v-model="row.numero_factura" class="editable-cell num-input" /></td>
             
             <td><input type="number" v-model="row.galonaje" class="editable-cell num-input" /></td>
 
-            <td><input v-model="row.numero_factura" class="editable-cell num-input" /></td>
+            <td>{{ row.fecha_salida }}</td>
             
             <td><input v-model="row.placa" class="editable-cell text-input" /></td>
 
