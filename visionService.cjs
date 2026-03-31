@@ -33,7 +33,7 @@ const extractInvoiceData = async (imagePath, mimeType = 'application/pdf') => {
             "cliente": "Nombre exacto del cliente comprador o destino (ej: ESTACION DE SERVICIO CENTRO DE...)",
             "destino": "YUMBO",
             "galonaje": numero (la cantidad en galones o Volumen máximo, ej: 3200),
-            "numero_factura": "Extrae ESTRICTAMENTE el 'Número de guía' (usualmente empieza por 4500...), NO extraigas el 'Número de Factura'",
+            "numero_factura": "Extrae el texto exacto de 'Número de guía:' que está justo debajo del título INFORMACIÓN GENERAL (ej: 4500320001689074). Ignora el 'Número de Factura'.",
             "placa": "Extrae el texto de 'Placa cabezote' que está abajo a la derecha en INFORMACIÓN TRANSPORTE (ej: SSK877)",
             "total_calculado": numero (si no hay total impreso, déjalo vacío)
         }
