@@ -273,7 +273,7 @@ const clearFortnight = () => {
     }
 };
 
-const saveFortnight = async () => {
+const saveFortnight = () => {
     if (tableData.value.length === 0) {
         alert("No hay facturas agregadas a esta quincena para guardar.");
         return;
@@ -286,29 +286,41 @@ const saveFortnight = async () => {
             periodTitle.value = newTitle.toUpperCase();
         }
 
-        const payload = {
+        // --- SISTEMA DE GUARDADO LOCAL (OPCIÓN A) ---
+        const savedData = localStorage.getItem('invoice_quincenas');
+        let quincenas = savedData ? JSON.parse(savedData) : [];
+        
+        if (!currentQuincenaId.value) {
+            currentQuincenaId.value = Date.now().toString();
+        }
+
+        const quincenaData = {
             id: currentQuincenaId.value,
             title: periodTitle.value,
             data: tableData.value
         };
         
+        const index = quincenas.findIndex(q => q.id === quincenaData.id);
+        if (index !== -1) {
+            quincenas[index] = quincenaData;
+        } else {
+            quincenas.push(quincenaData);
+        }
+        
+        localStorage.setItem('invoice_quincenas', JSON.stringify(quincenas));
+        alert('✅ Quincena guardada con éxito en este navegador.');
+        
+        // (Opcional) Intentar guardar en segundo plano sin bloquear si falla
         const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3001' : '';
-        const response = await fetch(`${API_BASE}/api/quincenas`, {
+        fetch(`${API_BASE}/api/quincenas`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-        
-        if (response.ok) {
-            const result = await response.json();
-            currentQuincenaId.value = result.quincena.id;
-            alert('✅ Quincena guardada con éxito.');
-        } else {
-            alert('❌ Error al guardar en el servidor.');
-        }
+            body: JSON.stringify(quincenaData)
+        }).catch(() => console.log("Guardado en nube falló, usando local."));
+
     } catch(err) {
         console.error("Save error", err);
-        alert('❌ Imposible conectar al servidor para guardar.');
+        alert('❌ Error al intentar guardar los datos.');
     }
 };
 

@@ -41,13 +41,26 @@ const emit = defineEmits(['close', 'load-quincena']);
 const quincenas = ref([]);
 const loading = ref(false);
 
-const loadHistory = async () => {
+const loadHistory = () => {
     loading.value = true;
     try {
-        const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3001' : '';
-        const res = await fetch(`${API_BASE}/api/quincenas`);
-        if(res.ok) {
-            quincenas.value = await res.json();
+        // --- PRIORIDAD 1: CARGAR DE LOCALSTORAGE (OPCIÓN A) ---
+        const savedData = localStorage.getItem('invoice_quincenas');
+        if (savedData) {
+            quincenas.value = JSON.parse(savedData);
+        } else {
+            // --- PRIORIDAD 2: INTENTAR CARGAR DEL SERVIDOR (BACKUP) ---
+            const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3001' : '';
+            fetch(`${API_BASE}/api/quincenas`).then(async res => {
+                if(res.ok) {
+                    const cloudData = await res.json();
+                    if (cloudData && cloudData.length > 0) {
+                        quincenas.value = cloudData;
+                        // Sincronizar hacia local si el servidor tiene algo que local no
+                        localStorage.setItem('invoice_quincenas', JSON.stringify(cloudData));
+                    }
+                }
+            }).catch(e => console.log("Nube no disponible"));
         }
     } catch(err) {
         console.error("Error cargando historial", err);
@@ -91,8 +104,18 @@ const loadQuincena = (q) => {
 const deleteQuincena = async (id) => {
     if(!confirm('¿Estás seguro de que deseas eliminar permanentemente este registro?')) return;
     try {
+        // --- ELIMINAR DE LOCALSTORAGE ---
+        const savedData = localStorage.getItem('invoice_quincenas');
+        if (savedData) {
+            let list = JSON.parse(savedData);
+            list = list.filter(q => q.id !== id);
+            localStorage.setItem('invoice_quincenas', JSON.stringify(list));
+        }
+
+        // --- INTENTAR ELIMINAR DEL SERVIDOR ---
         const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3001' : '';
-        await fetch(`${API_BASE}/api/quincenas/${id}`, { method: 'DELETE' });
+        fetch(`${API_BASE}/api/quincenas/${id}`, { method: 'DELETE' }).catch(() => {});
+        
         loadHistory();
     } catch(e) {
         alert("Error eliminando quincena");
