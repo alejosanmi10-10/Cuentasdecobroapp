@@ -273,7 +273,7 @@ const clearFortnight = () => {
     }
 };
 
-const saveFortnight = () => {
+const saveFortnight = async () => {
     if (tableData.value.length === 0) {
         alert("No hay facturas agregadas a esta quincena para guardar.");
         return;
@@ -286,10 +286,6 @@ const saveFortnight = () => {
             periodTitle.value = newTitle.toUpperCase();
         }
 
-        // --- SISTEMA DE GUARDADO LOCAL (OPCIÓN A) ---
-        const savedData = localStorage.getItem('invoice_quincenas');
-        let quincenas = savedData ? JSON.parse(savedData) : [];
-        
         if (!currentQuincenaId.value) {
             currentQuincenaId.value = Date.now().toString();
         }
@@ -299,29 +295,51 @@ const saveFortnight = () => {
             title: periodTitle.value,
             data: tableData.value
         };
-        
-        const index = quincenas.findIndex(q => q.id === quincenaData.id);
-        if (index !== -1) {
-            quincenas[index] = quincenaData;
-        } else {
-            quincenas.push(quincenaData);
-        }
-        
-        localStorage.setItem('invoice_quincenas', JSON.stringify(quincenas));
-        alert('✅ Quincena guardada con éxito en este navegador.');
-        
-        // (Opcional) Intentar guardar en segundo plano sin bloquear si falla
+
+        // --- PRIORIDAD 1: GUARDAR EN LA NUBE (MONGODB) ---
         const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3001' : '';
-        fetch(`${API_BASE}/api/quincenas`, {
+        const response = await fetch(`${API_BASE}/api/quincenas`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(quincenaData)
-        }).catch(() => console.log("Guardado en nube falló, usando local."));
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            currentQuincenaId.value = result.quincena.id;
+            alert('✅ Quincena guardada en la NUBE con éxito. ¡Ya puedes verla en tu celular!');
+        } else {
+            throw new Error("API Failure");
+        }
+
+        // --- RESPALDO: ACTUALIZAR TAMBIÉN LOCALSTORAGE ---
+        const savedData = localStorage.getItem('invoice_quincenas');
+        let quincenas = savedData ? JSON.parse(savedData) : [];
+        const index = quincenas.findIndex(q => q.id === quincenaData.id);
+        if (index !== -1) quincenas[index] = quincenaData;
+        else quincenas.push(quincenaData);
+        localStorage.setItem('invoice_quincenas', JSON.stringify(quincenas));
 
     } catch(err) {
         console.error("Save error", err);
-        alert('❌ Error al intentar guardar los datos.');
+        // Fallback total a local si la nube falla
+        saveLocalOnly();
     }
+};
+
+const saveLocalOnly = () => {
+    const quincenaData = {
+        id: currentQuincenaId.value || Date.now().toString(),
+        title: periodTitle.value,
+        data: tableData.value
+    };
+    const savedData = localStorage.getItem('invoice_quincenas');
+    let quincenas = savedData ? JSON.parse(savedData) : [];
+    const index = quincenas.findIndex(q => q.id === quincenaData.id);
+    if (index !== -1) quincenas[index] = quincenaData;
+    else quincenas.push(quincenaData);
+    localStorage.setItem('invoice_quincenas', JSON.stringify(quincenas));
+    alert('⚠️ No se pudo conectar con la nube, pero se guardó LOCALMENTE en este dispositivo.');
 };
 
 const loadFortnight = (quincena) => {

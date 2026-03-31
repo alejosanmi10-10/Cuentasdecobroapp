@@ -41,29 +41,28 @@ const emit = defineEmits(['close', 'load-quincena']);
 const quincenas = ref([]);
 const loading = ref(false);
 
-const loadHistory = () => {
+const loadHistory = async () => {
     loading.value = true;
     try {
-        // --- PRIORIDAD 1: CARGAR DE LOCALSTORAGE (OPCIÓN A) ---
+        const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3001' : '';
+        
+        // --- PRIORIDAD 1: CARGAR DE LA NUBE (Sincronización Total) ---
+        const res = await fetch(`${API_BASE}/api/quincenas`);
+        if(res.ok) {
+            const cloudData = await res.json();
+            quincenas.value = cloudData;
+            // Opcional: Respaldar en local lo que bajamos de la nube
+            localStorage.setItem('invoice_quincenas', JSON.stringify(cloudData));
+        } else {
+            throw new Error("Cloud not reachable");
+        }
+    } catch(err) {
+        console.warn("Nube no disponible, cargando desde local...", err);
+        // --- PRIORIDAD 2: CARGAR DE LOCALSTORAGE (FALLBACK) ---
         const savedData = localStorage.getItem('invoice_quincenas');
         if (savedData) {
             quincenas.value = JSON.parse(savedData);
-        } else {
-            // --- PRIORIDAD 2: INTENTAR CARGAR DEL SERVIDOR (BACKUP) ---
-            const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3001' : '';
-            fetch(`${API_BASE}/api/quincenas`).then(async res => {
-                if(res.ok) {
-                    const cloudData = await res.json();
-                    if (cloudData && cloudData.length > 0) {
-                        quincenas.value = cloudData;
-                        // Sincronizar hacia local si el servidor tiene algo que local no
-                        localStorage.setItem('invoice_quincenas', JSON.stringify(cloudData));
-                    }
-                }
-            }).catch(e => console.log("Nube no disponible"));
         }
-    } catch(err) {
-        console.error("Error cargando historial", err);
     } finally {
         loading.value = false;
     }
@@ -102,23 +101,24 @@ const loadQuincena = (q) => {
 }
 
 const deleteQuincena = async (id) => {
-    if(!confirm('¿Estás seguro de que deseas eliminar permanentemente este registro?')) return;
+    if(!confirm('¿Estás seguro de que deseas eliminar permanentemente este registro de TODOS tus dispositivos?')) return;
     try {
-        // --- ELIMINAR DE LOCALSTORAGE ---
+        const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3001' : '';
+        
+        // --- ELIMINAR DE LA NUBE ---
+        await fetch(`${API_BASE}/api/quincenas/${id}`, { method: 'DELETE' });
+
+        // --- ELIMINAR DE LOCALSTORAGE (RESPALDO) ---
         const savedData = localStorage.getItem('invoice_quincenas');
         if (savedData) {
             let list = JSON.parse(savedData);
             list = list.filter(q => q.id !== id);
             localStorage.setItem('invoice_quincenas', JSON.stringify(list));
         }
-
-        // --- INTENTAR ELIMINAR DEL SERVIDOR ---
-        const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3001' : '';
-        fetch(`${API_BASE}/api/quincenas/${id}`, { method: 'DELETE' }).catch(() => {});
         
         loadHistory();
     } catch(e) {
-        alert("Error eliminando quincena");
+        alert("Error al eliminar en la nube. Inténtalo de nuevo.");
     }
 }
 </script>
