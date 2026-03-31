@@ -88,7 +88,15 @@ const handleUploadSuccess = (extractedData) => {
             
             let total = 0;
             if (rate) {
-                total = (Number(newInvoice.galonaje) || 0) * rate.price;
+                if (rate.isFixed) {
+                    total = rate.price;
+                } else {
+                    total = (Number(newInvoice.galonaje) || 0) * rate.price;
+                }
+                
+                if (rate.discount) {
+                    total -= total * (rate.discount / 100);
+                }
             }
 
             // Bandera 'isNew' para la animación verde de CSS en ResultsTable

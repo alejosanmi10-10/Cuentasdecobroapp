@@ -11,11 +11,20 @@
         
         <div class="tarifas-list">
           <div v-for="(rate, index) in rates" :key="index" class="rate-item">
-            <input v-model="rate.client" placeholder="Nombre del Cliente (ej: TULUA)" class="rate-input" />
+            <input v-model="rate.client" placeholder="Nombre (ej: TULUA)" class="rate-input" />
             <div class="price-input-group">
                 <span class="currency-symbol">$</span>
-                <input type="number" step="0.01" v-model="rate.price" placeholder="Precio x Galón" class="rate-input price-val" />
+                <input type="number" step="0.01" v-model="rate.price" placeholder="Precio" class="rate-input price-val" />
             </div>
+            <div class="discount-input-group">
+                <span class="minus-symbol">-</span>
+                <input type="number" step="1" v-model="rate.discount" placeholder="Desc." class="rate-input discount-val" />
+                <span class="percent-symbol">%</span>
+            </div>
+            <label class="fixed-label">
+                <input type="checkbox" v-model="rate.isFixed" />
+                Viaje Fijo (No Galones)
+            </label>
             <button @click="removeRate(index)" class="remove-btn">🗑️</button>
           </div>
         </div>
@@ -41,18 +50,32 @@ const emit = defineEmits(['close', 'updated']);
 
 const rates = ref([]);
 
+const defaultRates = [
+  { client: "CARVAJAL", price: 525600, discount: 0, isFixed: true },
+  { client: "ETERNIT", price: 176928, discount: 0, isFixed: true },
+  { client: "SERVICIOS INDUSTRIALES", price: 314748, discount: 0, isFixed: true },
+  { client: "BRASILIA", price: 80, discount: 10, isFixed: false },
+  { client: "BUCANERO", price: 392400, discount: 0, isFixed: true },
+  { client: "LIMONES", price: 314343, discount: 0, isFixed: true },
+  { client: "TULUA", price: 160, discount: 10, isFixed: false },
+  { client: "IGLESIA CRISTIANA", price: 355811, discount: 0, isFixed: true },
+  { client: "POLIMIX", price: 366148, discount: 0, isFixed: true },
+  { client: "VIDRIO", price: 439, discount: 10, isFixed: false },
+  { client: "GLAWA", price: 327898, discount: 0, isFixed: true }
+];
+
 // Cargar del localStorage al abrir
 onMounted(() => {
     const saved = localStorage.getItem('invoice_rates');
-    if (saved) {
-        rates.ref = JSON.parse(saved);
-        // Usamos un pequeño truco para asegurar reactividad
+    if (saved && saved !== '[]') {
         rates.value = JSON.parse(saved);
+    } else {
+        rates.value = JSON.parse(JSON.stringify(defaultRates));
     }
 });
 
 const addRate = () => {
-    rates.value.push({ client: '', price: 0 });
+    rates.value.push({ client: '', price: 0, discount: 0, isFixed: false });
 };
 
 const removeRate = (index) => {
@@ -60,10 +83,11 @@ const removeRate = (index) => {
 };
 
 const saveAndClose = () => {
-    // Limpiamos nombres para que coincidan con la IA (mayúsculas y sin espacios extra)
     const cleanedRates = rates.value.filter(r => r.client.trim() !== '').map(r => ({
         client: r.client.trim().toUpperCase(),
-        price: Number(r.price) || 0
+        price: Number(r.price) || 0,
+        discount: Number(r.discount) || 0,
+        isFixed: Boolean(r.isFixed)
     }));
 
     localStorage.setItem('invoice_rates', JSON.stringify(cleanedRates));
@@ -138,7 +162,40 @@ const saveAndClose = () => {
 
 .price-val {
     border: none !important;
-    width: 100px;
+    width: 90px;
+}
+
+.discount-input-group {
+    display: flex;
+    align-items: center;
+    border: 2px solid #1a1a1a;
+    padding: 0 5px;
+    background: #f8fafc;
+}
+
+.discount-val {
+    border: none !important;
+    width: 60px;
+    text-align: center;
+    background: transparent;
+}
+
+.minus-symbol {
+    font-weight: bold;
+    color: #ef4444;
+}
+
+.percent-symbol {
+    font-weight: bold;
+    color: #64748b;
+}
+
+.fixed-label {
+    display: flex;
+    align-items: center;
+    font-size: 0.85rem;
+    font-weight: bold;
+    gap: 5px;
 }
 
 .remove-btn {
@@ -194,6 +251,12 @@ const saveAndClose = () => {
         width: 100%;
     }
     .price-val {
+        width: 100%;
+    }
+    .discount-input-group {
+        width: 100%;
+    }
+    .discount-val {
         width: 100%;
     }
     .remove-btn {
