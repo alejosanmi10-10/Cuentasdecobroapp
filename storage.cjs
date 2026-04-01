@@ -10,7 +10,8 @@ let useMongo = false;
 const quincenaSchema = new mongoose.Schema({
     id: { type: String, required: true },
     title: { type: String, required: true },
-    data: { type: Array, default: [] }
+    data: { type: Array, default: [] },
+    files: { type: Array, default: [] }
 });
 
 const QuincenaModel = mongoose.model('Quincena', quincenaSchema);

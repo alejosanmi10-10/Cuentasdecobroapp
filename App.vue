@@ -303,7 +303,8 @@ const saveFortnight = async () => {
         const quincenaData = {
             id: currentQuincenaId.value,
             title: periodTitle.value,
-            data: tableData.value
+            data: tableData.value,
+            files: uploadedFiles.value
         };
 
         // --- PRIORIDAD 1: GUARDAR EN LA NUBE (MONGODB) ---
@@ -342,7 +343,8 @@ const saveLocalOnly = () => {
     const quincenaData = {
         id: currentQuincenaId.value || Date.now().toString(),
         title: periodTitle.value,
-        data: tableData.value
+        data: tableData.value,
+        files: uploadedFiles.value
     };
     const savedData = localStorage.getItem('invoice_quincenas');
     let quincenas = savedData ? JSON.parse(savedData) : [];
@@ -358,5 +360,6 @@ const loadFortnight = (quincena) => {
     currentQuincenaId.value = quincena.id;
     periodTitle.value = quincena.title || 'QUINCENA RECUPERADA';
     tableData.value = quincena.data || [];
+    uploadedFiles.value = quincena.files || []; // Restaurar también los archivos de soporte
 };
 </script>

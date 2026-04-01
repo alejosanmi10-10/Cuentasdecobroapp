@@ -84,12 +84,17 @@
 
     <!-- PÁGINAS ADICIONALES: Soporte de Guías Originales -->
     <div v-for="(file, index) in uploadedFiles" :key="index" class="print-page attachment-page page-break">
-        <h3 class="print-title text-center">SOPORTE ORIGINAL: {{ file.split('-').pop() }}</h3>
+        <h3 class="print-title text-center">SOPORTE ORIGINAL: #{{ index + 1 }}</h3>
+        <p class="text-center no-print" style="font-size: 0.8rem; color: #666;">Archivo: {{ file }}</p>
         <div class="attachment-container">
-            <!-- Si es PDF intentamos embeberlo, si es imagen lo mostramos directamente -->
+            <!-- Si es PDF intentamos embeberlo -->
             <template v-if="file.toLowerCase().endsWith('.pdf')">
-                <iframe :src="'/uploads/' + file" class="embedded-doc" frameborder="0"></iframe>
+                <embed :src="'/uploads/' + file" type="application/pdf" class="embedded-doc" />
+                <p class="no-print" style="margin-top: 10px;">
+                    <a :href="'/uploads/' + file" target="_blank">Abrir PDF en pestaña nueva si no carga</a>
+                </p>
             </template>
+            <!-- Si es imagen lo mostramos directamente -->
             <template v-else>
                 <img :src="'/uploads/' + file" class="attachment-img" />
             </template>
