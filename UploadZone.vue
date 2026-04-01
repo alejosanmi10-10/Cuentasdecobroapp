@@ -70,8 +70,8 @@ const processFile = async (file) => {
     }
     
     const result = await response.json();
-    // Emitir el éxito para que App.vue lo inyecte en la tabla en tiempo real
-    emit('upload-success', result.data);
+    // Emitir el éxito con los datos extraídos y el nombre del archivo para soporte visual
+    emit('upload-success', result);
   } catch (error) {
     console.error("Fallo al procesar el archivo individual:", error);
     alert("❌ Fallo en la extracción: " + error.message);

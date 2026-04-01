@@ -107,9 +107,19 @@ const deleteQuincena = async (id) => {
     fs.writeFileSync(dbPath, JSON.stringify(filtered, null, 2));
 };
 
+const getDebugInfo = () => {
+    return {
+        useMongo,
+        hasMongoUri: !!process.env.MONGODB_URI,
+        uriPrefix: process.env.MONGODB_URI ? process.env.MONGODB_URI.substring(0, 15) : 'none',
+        dbPath
+    };
+};
+
 module.exports = {
     initDB,
     getAllQuincenas,
     saveQuincena,
-    deleteQuincena
+    deleteQuincena,
+    getDebugInfo
 };

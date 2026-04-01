@@ -75,8 +75,8 @@ const extractInvoiceData = async (imagePath, mimeType = 'application/pdf') => {
             console.error("Error menor limpiando el archivo en la nube:", e);
         }
 
-        // Limpiar el archivo local para no inflar la carpeta /uploads
-        fs.unlinkSync(imagePath);
+        // Se COMENTA la eliminación local para que el usuario pueda imprimir el soporte
+        // fs.unlinkSync(imagePath);
 
         return Array.isArray(dataArr) ? dataArr : [dataArr];
 

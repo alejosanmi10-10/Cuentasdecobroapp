@@ -25,7 +25,8 @@ router.post('/', upload.single('invoice'), async (req, res) => {
 
         res.json({
             success: true,
-            data: extractedData
+            data: extractedData,
+            filename: req.file.filename
         });
     } catch (error) {
         console.error('Error processing upload:', error);

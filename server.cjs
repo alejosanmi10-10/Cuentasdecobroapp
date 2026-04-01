@@ -10,11 +10,18 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
+// Servir la carpeta de subidas de forma estática
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // Routes
 app.use('/api/upload', uploadRouter);
 
 app.get('/api/quincenas', async (req, res) => {
     res.json(await storage.getAllQuincenas());
+});
+
+app.get('/api/debug', (req, res) => {
+    res.json(storage.getDebugInfo());
 });
 
 app.post('/api/quincenas', async (req, res) => {

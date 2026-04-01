@@ -45,13 +45,13 @@
       />
     </div>
 
-    <!-- Documento Imprimible (FUERA del no-print-area) -->
     <PrintDocument 
       :show="showPrint" 
       :tableData="tableData" 
       :tableTitle="periodTitle"
       :invoiceNumber="printInvoiceNumber"
       :invoiceDate="printInvoiceDate"
+      :uploadedFiles="uploadedFiles"
       @close="showPrint = false" 
     />
   </div>
@@ -73,9 +73,9 @@ const duplicateMessage = ref('');
 const showAdmin = ref(false);
 const showHistory = ref(false);
 const showPrint = ref(false);
-const printInvoiceNumber = ref('');
 const printInvoiceDate = ref('');
 const currentQuincenaId = ref(null);
+const uploadedFiles = ref([]); // Lista de archivos para soporte visual en la impresión
 
 // Tarifas por defecto para inicialización
 const defaultRates = [
@@ -152,9 +152,18 @@ const handleOpenPrint = () => {
     showPrint.value = true;
 };
 
-const handleUploadSuccess = (extractedData) => {
+const handleUploadSuccess = (payload) => {
     let duplicatedCount = 0;
     
+    // El payload ahora es un objeto { success, data, filename }
+    const extractedData = payload.data;
+    const filename = payload.filename;
+    
+    // Guardar el archivo para la impresión si no está ya en la lista
+    if (filename && !uploadedFiles.value.includes(filename)) {
+        uploadedFiles.value.push(filename);
+    }
+
     // Soporte para Array (Subida de un PDF entero)
     const invoices = Array.isArray(extractedData) ? extractedData : [extractedData];
 
@@ -268,6 +277,7 @@ const fallbackDownload = (blob, finalName) => {
 const clearFortnight = () => {
     if (confirm('¿Estás seguro que deseas limpiar la tabla para empezar una "Nueva Quincena"? \n\nAsegúrate de haber presionado "Guardar" primero si no quieres perder estos datos.')) {
         tableData.value = [];
+        uploadedFiles.value = []; // Limpiar también los archivos de soporte
         periodTitle.value = 'NUEVA QUINCENA';
         currentQuincenaId.value = null; // Reset ID for new record
     }
@@ -322,6 +332,7 @@ const saveFortnight = async () => {
 
     } catch(err) {
         console.error("Save error", err);
+        alert(`❌ Error al intentar guardar: ${err.message || "Fallo desconocido"}. Revisa la consola para más detalles.`);
         // Fallback total a local si la nube falla
         saveLocalOnly();
     }

@@ -81,6 +81,20 @@
         </tfoot>
       </table>
     </div>
+
+    <!-- PÁGINAS ADICIONALES: Soporte de Guías Originales -->
+    <div v-for="(file, index) in uploadedFiles" :key="index" class="print-page attachment-page page-break">
+        <h3 class="print-title text-center">SOPORTE ORIGINAL: {{ file.split('-').pop() }}</h3>
+        <div class="attachment-container">
+            <!-- Si es PDF intentamos embeberlo, si es imagen lo mostramos directamente -->
+            <template v-if="file.toLowerCase().endsWith('.pdf')">
+                <iframe :src="'/uploads/' + file" class="embedded-doc" frameborder="0"></iframe>
+            </template>
+            <template v-else>
+                <img :src="'/uploads/' + file" class="attachment-img" />
+            </template>
+        </div>
+    </div>
   </div>
 </template>
 
@@ -93,7 +107,11 @@ const props = defineProps({
   tableData: Array,
   tableTitle: String,
   invoiceNumber: String,
-  invoiceDate: String
+  invoiceDate: String,
+  uploadedFiles: {
+    type: Array,
+    default: () => []
+  }
 });
 
 defineEmits(['close']);
@@ -283,5 +301,39 @@ const handlePrint = () => {
         margin-top: 0 !important; 
         padding-top: 1cm !important;
     }
+
+    .attachment-page {
+        padding: 1cm !important;
+        page-break-after: always;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .attachment-img, .embedded-doc {
+        max-width: 100% !important;
+        height: auto !important;
+        max-height: 25cm !important;
+    }
+}
+
+.attachment-container {
+    width: 100%;
+    margin-top: 1cm;
+    display: flex;
+    justify-content: center;
+}
+
+.attachment-img {
+    max-width: 100%;
+    max-height: 24cm;
+    object-fit: contain;
+    border: 1px solid #ddd;
+}
+
+.embedded-doc {
+    width: 100%;
+    height: 24cm;
+    border: none;
 }
 </style>
