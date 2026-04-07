@@ -137,15 +137,30 @@ const handleOpenPrint = () => {
         return;
     }
     
-    // 1. Número de Cuenta
-    const num = prompt('¿Qué número de Cuenta de Cobro es? ej: 108\n\n(La fecha se calculará automáticamente)', '108');
-    if (num === null) return; // canceló
-    printInvoiceNumber.value = num;
-
-    // 2. Fecha (Automática)
+    // 1. Número y Fecha unificados por coma para evitar el bloqueo Anti-Spam del navegador
+    const today = new Date();
     const months = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
-    const d = new Date();
-    printInvoiceDate.value = `${d.getDate()} DE ${months[d.getMonth()]} DEL ${d.getFullYear()}`;
+    const defaultDate = `${today.getDate()} DE ${months[today.getMonth()]} DEL ${today.getFullYear()}`;
+
+    const input = prompt(
+        'GENERACIÓN DE CUENTA DE COBRO\n\n' +
+        'Ingresa el Número y (opcional) la Fecha separados por una COMA (,).\n' +
+        'Si solo pones el número, usaremos la fecha de hoy.\n\n' +
+        `Ejemplo: 108, ${defaultDate}`,
+        '108'
+    );
+
+    if (input === null) return; // Se canceló
+
+    const parts = input.split(',');
+    printInvoiceNumber.value = parts[0].trim();
+    
+    // Si escribió la fecha después de la coma, usarla. De lo contrario, usar automática.
+    if (parts.length > 1 && parts[1].trim() !== '') {
+        printInvoiceDate.value = parts[1].trim().toUpperCase();
+    } else {
+        printInvoiceDate.value = defaultDate;
+    }
 
     showPrint.value = true;
     console.log("Print mode activated", {
