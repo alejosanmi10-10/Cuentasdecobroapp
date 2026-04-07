@@ -1,4 +1,5 @@
 export function numberToWords(num) {
+    if (num === null || num === undefined || typeof num !== 'number' || isNaN(num)) return 'CERO';
     if (num === 0) return 'CERO';
 
     const Unidades = (n) => {

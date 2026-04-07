@@ -122,18 +122,40 @@ const props = defineProps({
 defineEmits(['close']);
 
 const totalSum = computed(() => {
-  return props.tableData.reduce((sum, item) => sum + Number(item.total_calculado || 0), 0);
+  try {
+    return props.tableData.reduce((sum, item) => {
+        const val = Number(item.total_calculado || 0);
+        return sum + (isNaN(val) ? 0 : val);
+    }, 0);
+  } catch (e) {
+    console.error("Error calculating totalSum:", e);
+    return 0;
+  }
 });
 
 const formatCurrency = (val) => {
-    return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(val);
+    try {
+        return new Intl.NumberFormat('es-CO', { 
+            style: 'currency', 
+            currency: 'COP', 
+            minimumFractionDigits: 0 
+        }).format(val || 0);
+    } catch (e) {
+        return "$ " + (val || 0);
+    }
 };
 
 const amountInWords = computed(() => {
-    return numberToWords(totalSum.value);
+    try {
+        return numberToWords(totalSum.value);
+    } catch (e) {
+        console.error("Error converting number to words:", e);
+        return "CERO";
+    }
 });
 
 const handlePrint = () => {
+    console.log("Printing document...");
     window.print();
 };
 </script>

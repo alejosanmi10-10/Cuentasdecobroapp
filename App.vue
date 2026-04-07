@@ -150,6 +150,11 @@ const handleOpenPrint = () => {
     printInvoiceDate.value = dateInput;
 
     showPrint.value = true;
+    console.log("Print mode activated", {
+        invoiceNumber: printInvoiceNumber.value,
+        invoiceDate: printInvoiceDate.value,
+        dataLength: tableData.value.length
+    });
 };
 
 const handleUploadSuccess = (payload) => {
