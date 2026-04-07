@@ -1,6 +1,6 @@
 # Ignorar dependencias pesadas
 node_modules/
-dist/
+# dist/  <- Comentado para obligar a Render a recibir los archivos compilados
 .DS_Store
 
 # Seguridad: IGNORAR LLAVES SECRETAS
