@@ -30,7 +30,17 @@ router.post('/', upload.single('invoice'), async (req, res) => {
         });
     } catch (error) {
         console.error('Error processing upload:', error);
-        res.status(500).json({ error: error.message || 'Internal server error while processing the invoice' });
+        
+        let errorDetalle = error.message;
+        if (!errorDetalle) {
+            try {
+                errorDetalle = JSON.stringify(error);
+            } catch(e) {
+                errorDetalle = String(error);
+            }
+        }
+        
+        res.status(500).json({ error: errorDetalle || 'Error interno desconocido' });
     }
 });
 
