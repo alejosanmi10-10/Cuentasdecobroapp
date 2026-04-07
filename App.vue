@@ -74,6 +74,7 @@ const showAdmin = ref(false);
 const showHistory = ref(false);
 const showPrint = ref(false);
 const printInvoiceDate = ref('');
+const printInvoiceNumber = ref('');
 const currentQuincenaId = ref(null);
 const uploadedFiles = ref([]); // Lista de archivos para soporte visual en la impresión
 
@@ -98,20 +99,20 @@ const getInitialRates = () => {
     if (saved && saved !== '[]') {
         return JSON.parse(saved);
     }
-    return defaultRates;
+    return [...defaultRates];
 };
 
-const masterRates = ref(getInitialRates());
+const rates = ref(getInitialRates());
 
 const handleRatesUpdated = (newRates) => {
-    masterRates.value = newRates;
+    rates.value = newRates;
     recalculatePrices(); // ¡ESTO ES NUEVO! Actualiza los precios de lo que ya tienes cargado
 };
 
 const recalculatePrices = () => {
     tableData.value = tableData.value.map(row => {
         const clientName = row.client || row.cliente || '';
-        const sortedRates = [...masterRates.value].sort((a, b) => b.client.length - a.client.length);
+        const sortedRates = [...rates.value].sort((a, b) => b.client.length - a.client.length);
         const rate = sortedRates.find(r => clientName.toUpperCase().includes(r.client.toUpperCase()));
         
         let total = row.total_calculado;
@@ -137,17 +138,14 @@ const handleOpenPrint = () => {
     }
     
     // 1. Número de Cuenta
-    const num = prompt('¿Qué número de Cuenta de Cobro es?', '108');
+    const num = prompt('¿Qué número de Cuenta de Cobro es? ej: 108\n\n(La fecha se calculará automáticamente)', '108');
     if (num === null) return; // canceló
     printInvoiceNumber.value = num;
 
-    // 2. Fecha (Formato de ejemplo del documento)
+    // 2. Fecha (Automática)
     const months = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
     const d = new Date();
-    const defaultDate = `${d.getDate()} DE ${months[d.getMonth()]} DEL ${d.getFullYear()}`;
-    const dateInput = prompt('Confirma la fecha para el documento:', defaultDate);
-    if (dateInput === null) return; // canceló
-    printInvoiceDate.value = dateInput;
+    printInvoiceDate.value = `${d.getDate()} DE ${months[d.getMonth()]} DEL ${d.getFullYear()}`;
 
     showPrint.value = true;
     console.log("Print mode activated", {
