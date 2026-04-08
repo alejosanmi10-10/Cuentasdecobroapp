@@ -89,10 +89,13 @@
         <div class="attachment-container">
             <!-- Si es PDF intentamos embeberlo -->
             <template v-if="file.toLowerCase().endsWith('.pdf')">
-                <embed :src="'/uploads/' + file" type="application/pdf" class="embedded-doc" />
-                <p class="no-print" style="margin-top: 10px;">
-                    <a :href="'/uploads/' + file" target="_blank">Abrir PDF en pestaña nueva si no carga</a>
-                </p>
+                <div class="pdf-print-placeholder" style="border: 2px dashed #9ca3af; padding: 40px; text-align: center; border-radius: 12px; margin: 20px 0;">
+                    <h2 style="color: #4b5563; font-size: 24px; margin-bottom: 15px;">📄 Archivo Adjunto en Formato PDF</h2>
+                    <p style="color: #6b7280; font-size: 16px;">Este soporte es un documento multipágina y no puede ser incrustado directamente en la impresión de esta hoja.</p>
+                    <p class="no-print" style="margin-top: 25px; background: #e0f2fe; padding: 15px; border-radius: 8px; display: inline-block;">
+                        👉 <a :href="'/uploads/' + file" target="_blank" style="color: #0369a1; font-weight: bold; text-decoration: none; font-size: 18px;">Hacer clic para abrir este Soporte en una pestaña nueva</a>
+                    </p>
+                </div>
             </template>
             <!-- Si es imagen lo mostramos directamente -->
             <template v-else>
