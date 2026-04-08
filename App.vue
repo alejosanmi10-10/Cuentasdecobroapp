@@ -194,7 +194,7 @@ const handleUploadSuccess = (payload) => {
         } else {
             // --- CÁLCULO AUTOMÁTICO DE VALORES ---
             const clientName = newInvoice.client || newInvoice.cliente || '';
-            const sortedRates = [...masterRates.value].sort((a, b) => b.client.length - a.client.length);
+            const sortedRates = [...rates.value].sort((a, b) => b.client.length - a.client.length);
             const rate = sortedRates.find(r => clientName.toUpperCase().includes(r.client.toUpperCase()));
             
             let total = 0;
