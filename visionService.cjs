@@ -17,8 +17,8 @@ const extractInvoiceData = async (imagePath, mimeType = 'application/pdf') => {
 
         console.log(`Archivo subido con éxito, procesando URI: ${uploadResult.file.uri}`);
 
-        // Usaremos el modelo más estable (1.5 Flash) para evitar caídas de servidor por alta demanda
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        // Usamos Gemini 2.0 Flash porque 1.5 fue descontinuado para esta cuenta y 2.5 sufre alta demanda
+        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
         const prompt = `
         Eres un asistente experto en contabilidad extraiendo datos. Analiza este documento comercial (que puede ser un PDF de múltiples páginas) y extrae meticulosamente TODAS las cuentas de cobro/guías de transporte presentes.
