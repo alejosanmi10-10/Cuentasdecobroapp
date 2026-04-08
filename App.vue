@@ -338,7 +338,8 @@ const saveFortnight = async () => {
             currentQuincenaId.value = result.quincena.id;
             alert('✅ Quincena guardada en la NUBE con éxito. ¡Ya puedes verla en tu celular!');
         } else {
-            throw new Error("API Failure");
+            const errText = await response.text();
+            throw new Error(`[Status ${response.status}] ${errText}`);
         }
 
         // --- RESPALDO: ACTUALIZAR TAMBIÉN LOCALSTORAGE ---

@@ -89,7 +89,13 @@
         <div class="attachment-container">
             <!-- Si es PDF intentamos embeberlo -->
             <template v-if="file.toLowerCase().endsWith('.pdf')">
-                <VuePdfEmbed :source="'/uploads/' + file" style="width: 100%; margin-bottom: 20px;" />
+                <div class="pdf-print-placeholder" style="border: 2px dashed #9ca3af; padding: 40px; text-align: center; border-radius: 12px; margin: 20px 0;">
+                    <h2 style="color: #4b5563; font-size: 24px; margin-bottom: 15px;">📄 Archivo Adjunto en Formato PDF</h2>
+                    <p style="color: #6b7280; font-size: 16px;">Este soporte es un documento multipágina y no puede ser incrustado directamente en la impresión de esta hoja.</p>
+                    <p class="no-print" style="margin-top: 25px; background: #e0f2fe; padding: 15px; border-radius: 8px; display: inline-block;">
+                        👉 <a :href="'/uploads/' + file" target="_blank" style="color: #0369a1; font-weight: bold; text-decoration: none; font-size: 18px;">Hacer clic para abrir este Soporte en una pestaña nueva</a>
+                    </p>
+                </div>
             </template>
             <!-- Si es imagen lo mostramos directamente -->
             <template v-else>
@@ -103,7 +109,6 @@
 <script setup>
 import { computed } from 'vue';
 import { numberToWords } from './numberToWords.js';
-import VuePdfEmbed from 'vue-pdf-embed';
 
 const props = defineProps({
   show: Boolean,
@@ -330,25 +335,23 @@ const handlePrint = () => {
     .attachment-page {
         padding: 1cm !important;
         page-break-after: always;
-        display: block !important;
-        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
 
-    .attachment-img, .embedded-doc, canvas {
+    .attachment-img, .embedded-doc {
         max-width: 100% !important;
         height: auto !important;
         max-height: 25cm !important;
-        background-color: white !important;
-        display: block !important;
-        margin: 0 auto !important;
     }
 }
 
 .attachment-container {
     width: 100%;
     margin-top: 1cm;
-    display: block;
-    text-align: center;
+    display: flex;
+    justify-content: center;
 }
 
 .attachment-img {

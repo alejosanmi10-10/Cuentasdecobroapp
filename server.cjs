@@ -61,7 +61,8 @@ app.post('/api/quincenas', async (req, res) => {
         const saved = await storage.saveQuincena(req.body);
         res.json({ success: true, quincena: saved });
     } catch(err) {
-        res.status(500).json({ error: "Failed to save quincena" });
+        console.error("Internal Server Error at POST /api/quincenas:", err);
+        res.status(500).json({ error: "Failed to save quincena", details: err.message });
     }
 });
 
